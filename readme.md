@@ -17,13 +17,12 @@
 
 <!-- doc-templite START generated -->
 <!-- time = '2018-09-23' -->
-<!-- name = 'integer32llc' -r->
+<!-- name = 'integer32llc' -->
 <!-- repo = 'rust-playground' -->
 <!-- commit = 'c54773e3b2112bd9d92297fa5af73ee80f58618b' -->
-
-| 版本     | 与日期        | 最新更新   | 更多               |
-| -------- | ------------- | ---------- | ------------------ |
-| [commit] | ⏰ 2018-09-23 | ![version] | [源码解释][source] |
+版本 | 与日期 | 最新更新 | 更多
+---|---|---|---
+[commit] | ⏰ 2018-09-23 | ![version] | [源码解释][source]
 
 [commit]: https://github.com/integer32llc/rust-playground/tree/c54773e3b2112bd9d92297fa5af73ee80f58618b
 [version]: https://img.shields.io/npm/v/rust-playground.svg

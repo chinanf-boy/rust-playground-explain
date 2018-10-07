@@ -103,4 +103,36 @@ git = "https://github.com/integer32llc/playground-middleware"
 
 ### src/main.rs
 
-- [ ] [src/main.rs](./src/main.md)
+- [x] [src/main.rs](./src/main.md)
+
+> 因为较多, 但思路很明显, 选择其中比较重要的一环, 不知道为什么类型代码真的多过逻辑代码
+
+## compiler/*
+
+docker 所在 
+
+### compiler/build.sh
+
+> 如果你想测试 容器的变化
+
+docker pull 项目
+
+- [x] [build.sh](./src/compiler/build.md) 这里和下面差不多, 只是混合一些环境变量, 看看有没有容器变化
+
+### compiler/fetch.sh
+
+> 如果你只想获得 当前的docker游乐场
+
+``` bash
+#!/bin/bash
+
+set -euv -o pipefail
+
+repository=shepmaster
+
+for image in rust-stable rust-beta rust-nightly rustfmt clippy miri; do
+    docker pull "${repository}/${image}"
+    # The backend expects images without a repository prefix
+    docker tag "${repository}/${image}" "${image}"
+done
+```

@@ -183,7 +183,7 @@ fn main() {
 }
 ```
 
-这里主要 说说`mount.mount("/execute", execute); // crago run`
+这里主要 说说`mount.mount("/execute", execute); // crago run | build | test`
 
 - [ ] [execute](#execute)
 
@@ -257,7 +257,7 @@ fn execute(req: &mut Request) -> IronResult<Response> {
 
 ```
 
-- [ ] [with_sandbox](#with_sandbox) 一个启动`sandbox.rs`对应函数的接口函数
+- [x] [with_sandbox](#with_sandbox) 一个启动`sandbox.rs`对应函数的接口函数
 
 
 ### format
@@ -397,8 +397,7 @@ where
 ```
 
 - [x] [run_handler](#run_handler) 运行`sandbox::对应函数`
-
-- [ ] [serialize_to_response](#serialize_to_response) 序列化响应
+- [x] [serialize_to_response](#serialize_to_response) 序列化响应
 
 ### with_sandbox_no_request
 ```rs
@@ -430,7 +429,7 @@ where
 }
 ```
 
-> f == [execute 中的 with_sandbox 第二个参数](#execute)
+> `f` == [execute 中的 with_sandbox 第二个参数](#execute)
 ```rs
 |sandbox, req: ExecuteRequest| {
         let req = try!(req.try_into());
@@ -441,12 +440,13 @@ where
     }
 ```
 
-- [ ] [Sandbox::execute](./src/sandbox.md#sandbox::execute)
+- [x] [deserialize_from_request](#deserialize_from_request)
+- [x] [Sandbox::execute](./src/sandbox.md#sandbox::execute)
 
 
 ### deserialize_from_request
 
-浏览器的请求的对应操作,操作完后返回响应
+浏览器的请求的反序列,和 docker操作,操作完后返回响应
 
 ``` rs
 fn deserialize_from_request<Req, Resp, F>(req: &mut Request, f: F) -> Result<Resp>
@@ -464,6 +464,11 @@ where
     Ok(resp)
 }
 
+```
+
+### run_handler_no_request
+
+```rs
 fn run_handler_no_request<Resp, F>(f: F) -> Result<Resp>
 where
     F: FnOnce(Sandbox) -> Result<Resp>,
@@ -490,6 +495,7 @@ where
     });
 
     match response {
+        // 整成 响应格式 , 即便是错误
         Ok(body) => Ok(Response::with((status::Ok, Header(ContentType::json()), body))),
         Err(err) => {
             let err = ErrorJson { error: err.to_string() };
@@ -501,6 +507,13 @@ where
     }
 }
 
+```
+
+- `serde_json` JSON序列化文件格式.
+- `serde_json::ser` 将Rust数据结构序列化为JSON数据.
+
+###
+```
 #[derive(Debug, Clone)]
 struct SandboxCacheInfo<T> {
     value: T,

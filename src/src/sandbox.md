@@ -180,6 +180,7 @@ impl Sandbox {
 ```
 
 #### Sandbox::execute
+
 ```rs
     pub fn execute(&self, req: &ExecuteRequest) -> Result<ExecuteResponse> {
         try!(self.write_source_code(&req.code));
@@ -193,7 +194,17 @@ impl Sandbox {
             stderr: try!(vec_to_str(output.stderr)),
         })
     }
+```
 
+- [x] [write_source_code](#sandbox::write_source_code)
+- [x] [execute_command](#sandbox::execute_command)
+- `command.output()` 命令运行并返回输出信息
+
+> - [ ] 现在的疑惑就是`docker`的部署问题
+
+### Sandbox::format
+
+```rs
     pub fn format(&self, req: &FormatRequest) -> Result<FormatResponse> {
         try!(self.write_source_code(&req.code));
         let mut command = self.format_command();
@@ -208,6 +219,11 @@ impl Sandbox {
         })
     }
 
+```
+
+### Sandbox::clippy
+
+```rs
     pub fn clippy(&self, req: &ClippyRequest) -> Result<ClippyResponse> {
         try!(self.write_source_code(&req.code));
         let mut command = self.clippy_command();
@@ -221,6 +237,11 @@ impl Sandbox {
         })
     }
 
+```
+
+### Sandbox::miri
+
+```rs
     pub fn miri(&self, req: &MiriRequest) -> Result<MiriResponse> {
         self.write_source_code(&req.code)?;
         let mut command = self.miri_command();
@@ -234,6 +255,11 @@ impl Sandbox {
         })
     }
 
+```
+
+### Sandbox::crates
+
+```rs
     pub fn crates(&self) -> Result<Vec<CrateInformation>> {
         let mut command = basic_secure_docker_command();
         command.args(&[Channel::Stable.container_name()]);
@@ -250,6 +276,11 @@ impl Sandbox {
         Ok(crates)
     }
 
+```
+
+### Sandbox::version
+
+```rs
     pub fn version(&self, channel: Channel) -> Result<Version> {
         let mut command = basic_secure_docker_command();
         command.args(&[channel.container_name()]);
@@ -274,25 +305,45 @@ impl Sandbox {
     }
 
 
+```
+
+### Sandbox::version_rustfmt
+
+```rs
     pub fn version_rustfmt(&self) -> Result<Version> {
         let mut command = basic_secure_docker_command();
         command.args(&["rustfmt", "cargo", "fmt", "--version"]);
         self.cargo_tool_version(command)
     }
 
+```
+
+### Sandbox::version_clippy
+
+```rs
     pub fn version_clippy(&self) -> Result<Version> {
         let mut command = basic_secure_docker_command();
         command.args(&["clippy", "cargo", "clippy", "--version"]);
         self.cargo_tool_version(command)
     }
 
+```
+
+### Sandbox::version_miri
+
+```rs
     pub fn version_miri(&self) -> Result<Version> {
         let mut command = basic_secure_docker_command();
         command.args(&["miri", "cargo", "miri", "--version"]);
         self.cargo_tool_version(command)
     }
 
-    // Parses versions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
+    
+```
+### Sandbox::cargo_tool_version
+    
+```rs
+    // Parses verrssions of the shape `toolname 0.0.0 (0000000 0000-00-00)`
     fn cargo_tool_version(&self, mut command: Command) -> Result<Version> {
         let output = command.output().map_err(Error::UnableToExecuteCompiler)?;
         let version_output = vec_to_str(output.stdout)?;
@@ -305,6 +356,13 @@ impl Sandbox {
         Ok(Version { release, commit_hash, commit_date })
     }
 
+```
+
+### Sandbox::write_source_code
+
+测验, 从浏览器提交的rust代码
+
+```rs
     fn write_source_code(&self, code: &str) -> Result<()> {
         let data = code.as_bytes();
 
@@ -318,6 +376,13 @@ impl Sandbox {
         Ok(())
     }
 
+```
+
+- `fn` 没有 `pub`了, 只能自己人用了
+
+### Sandbox::compile_command
+
+```rs
     fn compile_command(&self, target: CompileTarget, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
         let mut cmd = self.docker_command(Some(crate_type));
         set_execution_environment(&mut cmd, Some(target), crate_type, edition, backtrace);
@@ -331,19 +396,42 @@ impl Sandbox {
         cmd
     }
 
+```
+
+### Sandbox::execute_command
+
+返回命令, 主要两个部分组成
+
+1. docker 容器启动命令
+2. 在容器内运行的命令
+
+> `docker run rust-nightly echo 'hello'`  # 在 rust-nightly 容器运行 echo 'hello' 命令;
+> 1. `docker run rust-nightly`
+> 2. `echo 'hello'`
+
+```rs
     fn execute_command(&self, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool, backtrace: bool, edition: Option<Edition>) -> Command {
-        let mut cmd = self.docker_command(Some(crate_type));
+        let mut cmd = self.docker_command(Some(crate_type)); // 1. docker 
         set_execution_environment(&mut cmd, None, crate_type, edition, backtrace);
+        // 1. docker 运行环境
 
-        let execution_cmd = build_execution_command(None, channel, mode, crate_type, tests);
+        let execution_cmd = build_execution_command(None, channel, mode, crate_type, tests); // 2. 容器内命令
 
-        cmd.arg(&channel.container_name()).args(&execution_cmd);
+        cmd.arg(&channel.container_name()).args(&execution_cmd); // 组合命令
 
         debug!("Execution command is {:?}", cmd);
 
-        cmd
+        cmd // 返回
     }
+```
 
+- [x] [docker_command](#sandbox::docker_command)
+- [x] [set_execution_environment](#set_execution_environment)
+- [x] [build_execution_command](#build_execution_command)
+
+### Sandbox::format_command
+
+```rs
     fn format_command(&self) -> Command {
         let crate_type = CrateType::Binary;
 
@@ -356,6 +444,11 @@ impl Sandbox {
         cmd
     }
 
+```
+
+### Sandbox::clippy_command
+
+```rs
     fn clippy_command(&self) -> Command {
         let mut cmd = self.docker_command(None);
 
@@ -366,6 +459,11 @@ impl Sandbox {
         cmd
     }
 
+```
+
+### Sandbox::miri_command
+
+```rs
     fn miri_command(&self) -> Command {
         let mut cmd = self.docker_command(None);
 
@@ -376,6 +474,13 @@ impl Sandbox {
         cmd
     }
 
+```
+
+### Sandbox::docker_command
+
+根据从浏览器数据, 返回生成的docker命令
+
+```rs
     fn docker_command(&self, crate_type: Option<CrateType>) -> Command {
         let crate_type = crate_type.unwrap_or(CrateType::Binary);
 
@@ -397,9 +502,17 @@ impl Sandbox {
         cmd
     }
 }
+```
 
+- [x] [basic_secure_docker_command](#basic_secure_docker_command)
+
+### basic_secure_docker_command
+
+获取 默认安全 docker 命令组
+
+``` rs
 fn basic_secure_docker_command() -> Command {
-    let mut cmd = Command::new("docker");
+    let mut cmd = Command::new("docker"); 
 
     cmd
         .arg("run")
@@ -419,7 +532,21 @@ fn basic_secure_docker_command() -> Command {
 
     cmd
 }
+```
 
+- `Command` 是 命令行库, 可组合命令并能在终端运行
+
+### build_execution_command
+
+返回 cargo操作浏览器的rust代码命令, 主要是
+
+- `cargo wasm`
+- `cargo rustc`
+- `cargo test`
+- `cargo build`
+- `cargo run`
+
+``` rs
 fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode: Mode, crate_type: CrateType, tests: bool) -> Vec<&'static str> {
     use self::CompileTarget::*;
     use self::CrateType::*;
@@ -468,7 +595,13 @@ fn build_execution_command(target: Option<CompileTarget>, channel: Channel, mode
 
     cmd
 }
+```
 
+### set_execution_environment
+
+根据浏览器数据, 添加 docker 参数
+
+``` rs
 fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, crate_type: CrateType, edition: Option<Edition>, backtrace: bool) {
     use self::CompileTarget::*;
     use self::CrateType::*;
@@ -490,7 +623,14 @@ fn set_execution_environment(cmd: &mut Command, target: Option<CompileTarget>, c
         cmd.args(&["--env", "RUST_BACKTRACE=1"]);
     }
 }
+```
 
+- `cmd: &mut Command` 可变引用, 可操作命令
+
+
+### read
+
+``` rs
 fn read(path: &Path) -> Result<Option<String>> {
     let f = match File::open(path) {
         Ok(f) => f,

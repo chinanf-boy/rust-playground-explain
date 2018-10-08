@@ -2,7 +2,96 @@
 
 cargo 库的默认主文件
 
-#### extern
+### 目录
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+  - [extern](#extern)
+  - [use](#use)
+  - [cosnt + mod](#cosnt--mod)
+  - [1. main](#1-main)
+    - [1.1 React](#11-react)
+    - [1.2 后台 : 下面的都是后台内容](#12-%E5%90%8E%E5%8F%B0--%E4%B8%8B%E9%9D%A2%E7%9A%84%E9%83%BD%E6%98%AF%E5%90%8E%E5%8F%B0%E5%86%85%E5%AE%B9)
+  - [GhToken](#ghtoken)
+  - [compile](#compile)
+  - [execute](#execute)
+  - [format](#format)
+  - [clippy](#clippy)
+  - [miri](#miri)
+  - [meta_crates](#meta_crates)
+  - [meta_version_stable](#meta_version_stable)
+  - [meta_version_beta](#meta_version_beta)
+  - [meta_version_nightly](#meta_version_nightly)
+  - [meta_version_rustfmt](#meta_version_rustfmt)
+  - [meta_version_clippy](#meta_version_clippy)
+  - [meta_version_miri](#meta_version_miri)
+  - [meta_gist_create](#meta_gist_create)
+  - [meta_gist_get](#meta_gist_get)
+  - [evaluate](#evaluate)
+  - [with_sandbox](#with_sandbox)
+  - [with_sandbox_no_request](#with_sandbox_no_request)
+  - [run_handler](#run_handler)
+  - [deserialize_from_request](#deserialize_from_request)
+  - [run_handler_no_request](#run_handler_no_request)
+  - [serialize_to_response](#serialize_to_response)
+  - [struct](#struct)
+  - [1. SandboxCacheInfo](#1-sandboxcacheinfo)
+  - [2. SandboxCacheOne](#2-sandboxcacheone)
+  - [3. SandboxCache](#3-sandboxcache)
+  - [4. CachedSandbox](#4-cachedsandbox)
+  - [](#)
+  - [quick_error!](#quick_error)
+  - [type Result](#type-result)
+- [struct](#struct-1)
+  - [1. ErrorJson](#1-errorjson)
+  - [2. CompileRequest](#2-compilerequest)
+  - [3. CompileResponse](#3-compileresponse)
+  - [4. ExecuteRequest](#4-executerequest)
+  - [5. ExecuteResponse](#5-executeresponse)
+  - [6. FormatRequest](#6-formatrequest)
+  - [7. FormatResponse](#7-formatresponse)
+  - [8. ClippyRequest](#8-clippyrequest)
+  - [9. ClippyResponse](#9-clippyresponse)
+  - [10. MiriRequest](#10-mirirequest)
+  - [11. MiriResponse](#11-miriresponse)
+  - [12. CrateInformation](#12-crateinformation)
+  - [13. MetaCratesResponse](#13-metacratesresponse)
+  - [14. MetaVersionResponse](#14-metaversionresponse)
+  - [15. MetaGistCreateRequest](#15-metagistcreaterequest)
+  - [16. MetaGistResponse](#16-metagistresponse)
+  - [17. EvaluateRequest](#17-evaluaterequest)
+  - [18. EvaluateResponse](#18-evaluateresponse)
+- [impl:给结构写方法](#impl%E7%BB%99%E7%BB%93%E6%9E%84%E5%86%99%E6%96%B9%E6%B3%95)
+  - [sandbox::CompileRequest](#sandboxcompilerequest)
+  - [CompileResponse](#compileresponse)
+  - [sandbox::ExecuteRequest](#sandboxexecuterequest)
+  - [ExecuteResponse](#executeresponse)
+  - [sandbox::FormatRequest](#sandboxformatrequest)
+  - [FormatResponse](#formatresponse)
+  - [sandbox::ClippyRequest](#sandboxclippyrequest)
+  - [ClippyResponse](#clippyresponse)
+  - [sandbox::MiriRequest](#sandboxmirirequest)
+  - [MiriResponse](#miriresponse)
+  - [MetaCratesResponse](#metacratesresponse)
+  - [MetaVersionResponse](#metaversionresponse)
+  - [MetaGistResponse](#metagistresponse)
+  - [sandbox::ExecuteRequest](#sandboxexecuterequest-1)
+  - [EvaluateResponse](#evaluateresponse)
+- [parse](#parse)
+  - [parse_target](#parse_target)
+  - [parse_assembly_flavor](#parse_assembly_flavor)
+  - [parse_demangle_assembly](#parse_demangle_assembly)
+  - [parse_process_assembly](#parse_process_assembly)
+  - [parse_channel](#parse_channel)
+  - [parse_mode](#parse_mode)
+  - [parse_edition](#parse_edition)
+  - [parse_crate_type](#parse_crate_type)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+### extern
 
 ```rs
 #![feature(try_from)] // 需要夜晚nightly-构建版本的锈才能运动此项目，因为这个特性并不是标准
@@ -38,7 +127,7 @@ extern crate openssl_probe;
 
 - `#[macro_use]`- 库中宏的获取与使用
 
-#### use
+### use
 
 为了[省略写前缀](https://rustwiki.org/zh-CN/rust-by-example/custom_types/enum/enum_use.html), 的语法糖
 
@@ -70,7 +159,7 @@ use serde::de::DeserializeOwned;
 use sandbox::Sandbox;
 ```
 
-#### cosnt + mod
+### cosnt + mod
 
 [const 常量](https://rustwiki.org/zh-CN/rust-by-example/custom_types/constants.html) 加 [mod 模块导入](https://rustwiki.org/zh-CN/rust-by-example/mod/split.html)
 
@@ -90,7 +179,7 @@ const ONE_YEAR_IN_SECONDS: u64 = 60 * 60 * 24 * 365;
 const SANDBOX_CACHE_TIME_TO_LIVE_IN_SECONDS: u64 = ONE_HOUR_IN_SECONDS as u64;
 ```
 
-#### 1. main
+### 1. main
 
 根据设置, 启动 iron 服务器, 路由对应控制函数
 
@@ -112,7 +201,7 @@ fn main() {
     // 设置获取
 ```
 
-##### 1.1 React
+#### 1.1 React
 
 ```rs
     let files = Staticfile::new(&root).expect("不能打开 root 目录");
@@ -135,7 +224,7 @@ fn main() {
 
 - [ ] [frontend > react](./frontend/readme.md)
 
-##### 1.2 后台
+#### 1.2 后台 : 下面的都是后台内容
 
 ```rs
     mount.mount("/compile", compile); // arm, Show LLVM IR
@@ -187,7 +276,7 @@ fn main() {
 
 - [ ] [execute](#execute)
 
-####
+### GhToken
 
 ```rs
 #[derive(Debug, Clone)]
@@ -210,6 +299,11 @@ impl iron::typemap::Key for GhToken {
     type Value = Self;
 }
 
+```
+
+### compile
+
+```rs
 fn compile(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: CompileRequest| {
         let req = try!(req.try_into());
@@ -273,6 +367,11 @@ fn format(req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### clippy
+
+```rs
 fn clippy(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: ClippyRequest| {
         sandbox
@@ -282,6 +381,11 @@ fn clippy(req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### miri
+
+```rs
 fn miri(req: &mut Request) -> IronResult<Response> {
     with_sandbox(req, |sandbox, req: MiriRequest| {
         sandbox
@@ -291,6 +395,11 @@ fn miri(req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_crates
+
+```rs
 fn meta_crates(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -299,6 +408,11 @@ fn meta_crates(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_version_stable
+
+```rs
 fn meta_version_stable(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -307,6 +421,11 @@ fn meta_version_stable(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_version_beta
+
+```rs
 fn meta_version_beta(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -315,6 +434,11 @@ fn meta_version_beta(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_version_nightly
+
+```rs
 fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -323,6 +447,11 @@ fn meta_version_nightly(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_version_rustfmt
+
+```rs
 fn meta_version_rustfmt(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -331,6 +460,11 @@ fn meta_version_rustfmt(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_version_clippy
+
+```rs
 fn meta_version_clippy(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -339,6 +473,11 @@ fn meta_version_clippy(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_version_miri
+
+```rs
 fn meta_version_miri(_req: &mut Request) -> IronResult<Response> {
     with_sandbox_no_request(|sandbox| {
         cached(sandbox)
@@ -347,6 +486,11 @@ fn meta_version_miri(_req: &mut Request) -> IronResult<Response> {
     })
 }
 
+```
+
+### meta_gist_create
+
+```rs
 fn meta_gist_create(req: &mut Request) -> IronResult<Response> {
     let token = req.extensions.get::<GhToken>().unwrap().0.as_ref().clone();
     serialize_to_response(deserialize_from_request(req, |r: MetaGistCreateRequest| {
@@ -355,6 +499,11 @@ fn meta_gist_create(req: &mut Request) -> IronResult<Response> {
     }))
 }
 
+```
+
+### meta_gist_get
+
+```rs
 fn meta_gist_get(req: &mut Request) -> IronResult<Response> {
     match req.extensions.get::<Router>().unwrap().find("id") {
         Some(id) => {
@@ -368,6 +517,12 @@ fn meta_gist_get(req: &mut Request) -> IronResult<Response> {
     }
 }
 
+
+```
+
+### evaluate
+
+```rs
 // 这是一个向后兼容的垫片。 Rust主页和
 // 文档使用它来运行代码。
 fn evaluate(req: &mut Request) -> IronResult<Response> {
@@ -383,6 +538,8 @@ fn evaluate(req: &mut Request) -> IronResult<Response> {
 ```
 
 ### with_sandbox
+
+将请求扔给后面函数处理
 
 ```rs
 fn with_sandbox<Req, Resp, F>(req: &mut Request, f: F) -> IronResult<Response>
@@ -512,14 +669,22 @@ where
 - `serde_json` JSON序列化文件格式.
 - `serde_json::ser` 将Rust数据结构序列化为JSON数据.
 
-###
-```
+### struct
+
+### 1. SandboxCacheInfo
+
+```rs
 #[derive(Debug, Clone)]
 struct SandboxCacheInfo<T> {
     value: T,
     time: Instant,
 }
 
+```
+
+### 2. SandboxCacheOne
+
+```rs
 /// 缓存单个操作的成功值
 #[derive(Debug)]
 struct SandboxCacheOne<T>(Mutex<Option<SandboxCacheInfo<T>>>);
@@ -565,6 +730,10 @@ where
     }
 }
 
+```
+
+### 3. SandboxCache
+```rs
 /// 缓存所有沙盒操作的成功结果
 /// 缓存感。
 #[derive(Debug, Default)]
@@ -578,6 +747,10 @@ struct SandboxCache {
     version_miri: SandboxCacheOne<sandbox::Version>,
 }
 
+```
+
+### 4. CachedSandbox
+```rs
 /// 为Sandbox提供类似的API，用于缓存成功的结果。
 struct CachedSandbox<'a> {
     sandbox: Sandbox,
@@ -626,6 +799,11 @@ impl<'a> CachedSandbox<'a> {
     }
 }
 
+```
+
+###
+
+```rs
 /// 一个方便的构造函数
 fn cached(sandbox: Sandbox) -> CachedSandbox<'static> {
     lazy_static! {
@@ -638,6 +816,12 @@ fn cached(sandbox: Sandbox) -> CachedSandbox<'static> {
     }
 }
 
+```
+
+### quick_error!
+
+错误宏, 用于相关错误信息的输出
+```rs
 quick_error! {
     #[derive(Debug)]
     pub enum Error {
@@ -702,16 +886,34 @@ quick_error! {
     }
 }
 
+```
+
+### type Result
+
+```rs
 type Result<T> = ::std::result::Result<T, Error>;
 
 const FATAL_ERROR_JSON: &str =
     r#"{"error": "Multiple cascading errors occurred, abandon all hope"}"#;
 
+
+```
+
+## struct
+
+### 1. ErrorJson
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct ErrorJson {
     error: String,
 }
 
+```
+
+### 2. CompileRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct CompileRequest {
     target: String,
@@ -733,6 +935,11 @@ struct CompileRequest {
     code: String,
 }
 
+```
+
+### 3. CompileResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct CompileResponse {
     success: bool,
@@ -741,6 +948,11 @@ struct CompileResponse {
     stderr: String,
 }
 
+```
+
+### 4. ExecuteRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct ExecuteRequest {
     channel: String,
@@ -755,6 +967,11 @@ struct ExecuteRequest {
     code: String,
 }
 
+```
+
+### 5. ExecuteResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct ExecuteResponse {
     success: bool,
@@ -762,11 +979,21 @@ struct ExecuteResponse {
     stderr: String,
 }
 
+```
+
+### 6. FormatRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct FormatRequest {
     code: String,
 }
 
+```
+
+### 7. FormatResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct FormatResponse {
     success: bool,
@@ -775,11 +1002,21 @@ struct FormatResponse {
     stderr: String,
 }
 
+```
+
+### 8. ClippyRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct ClippyRequest {
     code: String,
 }
 
+```
+
+### 9. ClippyResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct ClippyResponse {
     success: bool,
@@ -787,11 +1024,21 @@ struct ClippyResponse {
     stderr: String,
 }
 
+```
+
+### 10. MiriRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct MiriRequest {
     code: String,
 }
 
+```
+
+### 11. MiriResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct MiriResponse {
     success: bool,
@@ -799,6 +1046,11 @@ struct MiriResponse {
     stderr: String,
 }
 
+```
+
+### 12. CrateInformation
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct CrateInformation {
     name: String,
@@ -806,11 +1058,21 @@ struct CrateInformation {
     id: String,
 }
 
+```
+
+### 13. MetaCratesResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct MetaCratesResponse {
     crates: Vec<CrateInformation>,
 }
 
+```
+
+### 14. MetaVersionResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct MetaVersionResponse {
     version: String,
@@ -818,11 +1080,21 @@ struct MetaVersionResponse {
     date: String,
 }
 
+```
+
+### 15. MetaGistCreateRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct MetaGistCreateRequest {
     code: String,
 }
 
+```
+
+### 16. MetaGistResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct MetaGistResponse {
     id: String,
@@ -830,6 +1102,11 @@ struct MetaGistResponse {
     code: String,
 }
 
+```
+
+### 17. EvaluateRequest
+
+```rs
 #[derive(Debug, Clone, Deserialize)]
 struct EvaluateRequest {
     version: String,
@@ -837,12 +1114,24 @@ struct EvaluateRequest {
     code: String,
 }
 
+```
+
+### 18. EvaluateResponse
+
+```rs
 #[derive(Debug, Clone, Serialize)]
 struct EvaluateResponse {
     result: String,
     error: Option<String>,
 }
 
+```
+
+## impl:给结构写方法
+
+### sandbox::CompileRequest
+
+```rs
 impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     type Error = Error;
 
@@ -882,6 +1171,11 @@ impl TryFrom<CompileRequest> for sandbox::CompileRequest {
     }
 }
 
+```
+
+### CompileResponse
+
+```rs
 impl From<sandbox::CompileResponse> for CompileResponse {
     fn from(me: sandbox::CompileResponse) -> Self {
         CompileResponse {
@@ -892,7 +1186,11 @@ impl From<sandbox::CompileResponse> for CompileResponse {
         }
     }
 }
+```
 
+### sandbox::ExecuteRequest
+
+```rs
 impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
     type Error = Error;
 
@@ -909,6 +1207,11 @@ impl TryFrom<ExecuteRequest> for sandbox::ExecuteRequest {
     }
 }
 
+```
+
+### ExecuteResponse
+
+```rs
 impl From<sandbox::ExecuteResponse> for ExecuteResponse {
     fn from(me: sandbox::ExecuteResponse) -> Self {
         ExecuteResponse {
@@ -919,6 +1222,11 @@ impl From<sandbox::ExecuteResponse> for ExecuteResponse {
     }
 }
 
+```
+
+### sandbox::FormatRequest
+
+```rs
 impl TryFrom<FormatRequest> for sandbox::FormatRequest {
     type Error = Error;
 
@@ -929,6 +1237,11 @@ impl TryFrom<FormatRequest> for sandbox::FormatRequest {
     }
 }
 
+```
+
+### FormatResponse
+
+```rs
 impl From<sandbox::FormatResponse> for FormatResponse {
     fn from(me: sandbox::FormatResponse) -> Self {
         FormatResponse {
@@ -940,6 +1253,11 @@ impl From<sandbox::FormatResponse> for FormatResponse {
     }
 }
 
+```
+
+### sandbox::ClippyRequest
+
+```rs
 impl From<ClippyRequest> for sandbox::ClippyRequest {
     fn from(me: ClippyRequest) -> Self {
         sandbox::ClippyRequest {
@@ -948,6 +1266,11 @@ impl From<ClippyRequest> for sandbox::ClippyRequest {
     }
 }
 
+```
+
+### ClippyResponse
+
+```rs
 impl From<sandbox::ClippyResponse> for ClippyResponse {
     fn from(me: sandbox::ClippyResponse) -> Self {
         ClippyResponse {
@@ -958,6 +1281,11 @@ impl From<sandbox::ClippyResponse> for ClippyResponse {
     }
 }
 
+```
+
+### sandbox::MiriRequest
+
+```rs
 impl From<MiriRequest> for sandbox::MiriRequest {
     fn from(me: MiriRequest) -> Self {
         sandbox::MiriRequest {
@@ -966,6 +1294,11 @@ impl From<MiriRequest> for sandbox::MiriRequest {
     }
 }
 
+```
+
+### MiriResponse
+
+```rs
 impl From<sandbox::MiriResponse> for MiriResponse {
     fn from(me: sandbox::MiriResponse) -> Self {
         MiriResponse {
@@ -976,6 +1309,11 @@ impl From<sandbox::MiriResponse> for MiriResponse {
     }
 }
 
+```
+
+### MetaCratesResponse
+
+```rs
 impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
     fn from(me: Vec<sandbox::CrateInformation>) -> Self {
         let crates = me.into_iter()
@@ -988,6 +1326,11 @@ impl From<Vec<sandbox::CrateInformation>> for MetaCratesResponse {
     }
 }
 
+```
+
+### MetaVersionResponse
+
+```rs
 impl From<sandbox::Version> for MetaVersionResponse {
     fn from(me: sandbox::Version) -> Self {
         MetaVersionResponse {
@@ -998,6 +1341,11 @@ impl From<sandbox::Version> for MetaVersionResponse {
     }
 }
 
+```
+
+### MetaGistResponse
+
+```rs
 impl From<gist::Gist> for MetaGistResponse {
     fn from(me: gist::Gist) -> Self {
         MetaGistResponse {
@@ -1008,6 +1356,11 @@ impl From<gist::Gist> for MetaGistResponse {
     }
 }
 
+```
+
+### sandbox::ExecuteRequest
+
+```rs
 impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
     type Error = Error;
 
@@ -1024,6 +1377,11 @@ impl TryFrom<EvaluateRequest> for sandbox::ExecuteRequest {
     }
 }
 
+```
+
+### EvaluateResponse
+
+```rs
 impl From<sandbox::ExecuteResponse> for EvaluateResponse {
     fn from(me: sandbox::ExecuteResponse) -> Self {
         // 旧操场没有使用货物，所以从来没有使用过货物
@@ -1050,6 +1408,15 @@ impl From<sandbox::ExecuteResponse> for EvaluateResponse {
     }
 }
 
+```
+
+## parse
+
+解析数据
+
+### parse_target
+
+```rs
 fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     Ok(match s {
         "asm" => sandbox::CompileTarget::Assembly(sandbox::AssemblyFlavor::Att,
@@ -1062,6 +1429,11 @@ fn parse_target(s: &str) -> Result<sandbox::CompileTarget> {
     })
 }
 
+```
+
+### parse_assembly_flavor
+
+```rs
 fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
     Ok(match s {
         "att" => sandbox::AssemblyFlavor::Att,
@@ -1070,6 +1442,11 @@ fn parse_assembly_flavor(s: &str) -> Result<sandbox::AssemblyFlavor> {
     })
 }
 
+```
+
+### parse_demangle_assembly
+
+```rs
 fn parse_demangle_assembly(s: &str) -> Result<sandbox::DemangleAssembly> {
     Ok(match s {
         "demangle" => sandbox::DemangleAssembly::Demangle,
@@ -1078,6 +1455,11 @@ fn parse_demangle_assembly(s: &str) -> Result<sandbox::DemangleAssembly> {
     })
 }
 
+```
+
+### parse_process_assembly
+
+```rs
 fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     Ok(match s {
         "filter" => sandbox::ProcessAssembly::Filter,
@@ -1086,6 +1468,11 @@ fn parse_process_assembly(s: &str) -> Result<sandbox::ProcessAssembly> {
     })
 }
 
+```
+
+### parse_channel
+
+```rs
 fn parse_channel(s: &str) -> Result<sandbox::Channel> {
     Ok(match s {
         "stable" => sandbox::Channel::Stable,
@@ -1095,6 +1482,11 @@ fn parse_channel(s: &str) -> Result<sandbox::Channel> {
     })
 }
 
+```
+
+### parse_mode
+
+```rs
 fn parse_mode(s: &str) -> Result<sandbox::Mode> {
     Ok(match s {
         "debug" => sandbox::Mode::Debug,
@@ -1103,6 +1495,11 @@ fn parse_mode(s: &str) -> Result<sandbox::Mode> {
     })
 }
 
+```
+
+### parse_edition
+
+```rs
 fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
     Ok(match s {
         "" => None,
@@ -1112,6 +1509,11 @@ fn parse_edition(s: &str) -> Result<Option<sandbox::Edition>> {
     })
 }
 
+```
+
+### parse_crate_type
+
+```rs
 fn parse_crate_type(s: &str) -> Result<sandbox::CrateType> {
     use sandbox::{CrateType::*, LibraryType::*};
     Ok(match s {

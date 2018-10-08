@@ -213,7 +213,7 @@ fn main() {
     files.link_after(Prefix::new(&["assets"], Cache::new(one_year)));
     files.link_after(GuessContentType::new(ContentType::html().0));
 
-    let mut gist_router = Router::new(); // iron 的路由
+    let mut gist_router = Router::new(); // 路由: 关于github 的 gist 权限
     gist_router.post("/", meta_gist_create, "gist_create");
     gist_router.get("/:id", meta_gist_get, "gist_get");
 
@@ -274,7 +274,14 @@ fn main() {
 
 这里主要 说说`mount.mount("/execute", execute); // crago run | build | test`
 
-- [ ] [execute](#execute)
+- [x] [execute](#execute)
+
+真的好多类型定义, 不怎么想看了, 明明几个路由函数+类型+impl, 都挤到一个文件
+但逻辑明明很简单, 却这么长, 类型堆成山似的一样
+
+- [ ] [compile](#compile)
+
+
 
 ### GhToken
 

@@ -16,6 +16,7 @@
 ## explain 🀄️
 
 <!-- doc-templite START generated -->
+<!-- docTempliteId = 'github' -->
 <!-- time = '2018-09-23' -->
 <!-- name = 'integer32llc' -->
 <!-- repo = 'rust-playground' -->
@@ -25,7 +26,7 @@
 [commit] | ⏰ 2018-09-23 | ![version] | [源码解释][source]
 
 [commit]: https://github.com/integer32llc/rust-playground/tree/c54773e3b2112bd9d92297fa5af73ee80f58618b
-[version]: https://img.shields.io/npm/v/rust-playground.svg
+[version]: https://img.shields.io/github/last-commit/integer32llc/rust-playground.svg
 
 <!-- doc-templite END generated -->
 
